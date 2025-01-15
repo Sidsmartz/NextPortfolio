@@ -81,6 +81,9 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        tiny: ['Tiny5','sans-serif'],
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

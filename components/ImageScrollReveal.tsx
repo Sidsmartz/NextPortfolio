@@ -53,13 +53,13 @@ const ImageScrollReveal = () => {
   ];
 
   return (
-    <div className="font-sans text-red-500">
+    <div className="font-tiny text-red-500">
         <Spotlight className="" fill="purple"/>
         <Spotlight className="" fill="purple"/>
 
         <Spotlight className="-top-10" fill="blue"/>
         <header className="w-full h-72 flex justify-between items-start p-4">
-        <p className="uppercase font-mono">Scroll To Reveal</p>
+        <p className="uppercase font-tiny">Scroll To Reveal</p>
       </header>
       <main className="w-full">
         {rows.map((row) => (

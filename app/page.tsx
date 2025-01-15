@@ -6,10 +6,11 @@ import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import ImageScrollReveal from "@/components/ImageScrollReveal"
 import Circular3DGallery from "@/components/Circular3DGallery";
 import SplineComponentGPad from "@/components/ui/SplineComponentGPad";
+import SplineComponentGPadMobile from "@/components/SplineComponentGPadMobile";
 
 export default function Home() {
   return (
-    <main className="relative bg-black-100 flex justify-center items-center flex-col overflow-hidden mx-auto sm:px-10 px-5">
+    <main className="relative bg-black flex justify-center items-center flex-col overflow-hidden mx-auto sm:px-10 px-5">
       
       <div className="w-[100vw] h-full">
         <SplineComponent />
@@ -23,16 +24,16 @@ export default function Home() {
         <ImageScrollReveal/>
       </div>
 
-      <div className="w-[100vw] h-full">
+      <div className="hidden sm:block">
         <SplineComponentGPad />
       </div>
 
-      <div>
-        <Circular3DGallery />
+      <div className="justify-center block lg:hidden">
+        <SplineComponentGPadMobile />
       </div>
 
       <div>
-        <TextHoverEffect text="Contact Me"/>
+        <Circular3DGallery  className="w-[100vw] h-[100vh] flex justify-center items-center" />
       </div>
 
     </main>

@@ -9,8 +9,8 @@ import { Spotlight } from "./ui/Spotlight";
 const RecentProjects = () => {
   return (
     
-    <div className="py-20">
-      <h1 className="heading">
+    <div className="py-20 font-tiny">
+      <h1 className="heading font-tiny">
         Some of my{" "}
         <span className="text-purple">recent projects</span>
       </h1>
