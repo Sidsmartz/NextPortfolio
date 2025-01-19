@@ -8,16 +8,15 @@ import { Spotlight } from "./ui/Spotlight";
 
 const RecentProjects = () => {
   return (
-    
     <div className="py-20 font-tiny">
       <h1 className="heading font-tiny">
         Some of my{" "}
-        <span className="text-purple">recent projects</span>
+        <span className="text-red-500">recent projects</span>
       </h1>
-      <div className="flex flex-wrap items-center justify-center p-4 gap-16 mt-10">
+      <div className="border-red-800 flex flex-wrap items-center justify-center p-4 gap-16 mt-10">
         {projects.map(({id, title, des, img, iconLists, link}) => (
           <div
-            className="lg:min-h-[32.5rem] h-[25rem] flex items-center justify-center sm:w-96 w-[80vw]"
+            className=" border-red-500 lg:min-h-[32.5rem] h-[25rem] flex items-center justify-center sm:w-96 w-[80vw]"
             key={id}
           >
             
@@ -25,10 +24,10 @@ const RecentProjects = () => {
               title={link}
               href={link}
             >
-              <div className="relative flex items-center justify-center sm:w-96 w-[80vw] overflow-hidden h-[20vh] lg:h-[30vh] mb-10">
+              <div className="border-red-500 relative flex items-center justify-center sm:w-96 w-[80vw] overflow-hidden h-[20vh] lg:h-[30vh] mb-10">
                 <div
-                  className="relative w-full h-full overflow-hidden lg:rounded-3xl"
-                  style={{ backgroundColor: "#000319" }}
+                  className="border-red-500 relative w-full h-full overflow-hidden lg:rounded-3xl"
+                  style={{ backgroundColor: "#  " }}
                 >
                   <img src="/bg.png" alt="bgimg" />
                 </div>
@@ -40,14 +39,14 @@ const RecentProjects = () => {
               </div>
                   <div>
                     <Spotlight className="-top-40 -left-10 md:-left-32 h-screen" 
-                    fill="white"/>
+                    fill="red"/>
                     <Spotlight className="top-10 left-full h-[80vh] w-[50vw]" 
                     fill="purple"/>
                     <Spotlight className="top-28 left-80 h-[80vh] w-[50vw]"
                     fill="blue"/>
                   </div>
 
-              <h1 className="font-bold lg:text-2xl md:text-xl text-base line-clamp-1">
+              <h1 className="font-bold text-red-300 lg:text-2xl md:text-xl text-base line-clamp-1">
                 {title}
               </h1>
 
@@ -66,7 +65,7 @@ const RecentProjects = () => {
                   {iconLists.map((icon, index) => (
                     <div
                       key={index}
-                      className="border border-white/[.2] rounded-full bg-black lg:w-10 lg:h-10 w-8 h-8 flex justify-center items-center"
+                      className="border border-red-400/[.2] rounded-full bg-black lg:w-10 lg:h-10 w-8 h-8 flex justify-center items-center"
                       style={{
                         transform: `translateX(-${5 * index + 2}px)`,
                       }}
@@ -77,10 +76,10 @@ const RecentProjects = () => {
                 </div>
 
                 <div className="flex justify-center items-center">
-                  <p className="flex lg:text-xl md:text-xs text-sm text-purple">
+                  <p className="flex text-red-400 lg:text-xl md:text-xs text-sm text-purple">
                     Check it out!
                   </p>
-                  <FaLocationArrow className="ms-3" color="#CBACF9" />
+                  <FaLocationArrow className="ms-3" color="red" />
                 </div>
               </div>
             </PinContainer>

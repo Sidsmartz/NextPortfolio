@@ -28,12 +28,19 @@ export default function Home() {
         <SplineComponentGPad />
       </div>
 
+      <br>
+      </br>
+
+      <span>
+        
+      </span>
+
       <div className="justify-center block lg:hidden">
         <SplineComponentGPadMobile />
       </div>
 
       <div>
-        <Circular3DGallery  className="w-[100vw] h-[100vh] flex justify-center items-center" />
+        <Circular3DGallery className="w-[100vw] h-[100vh] flex justify-center items-center" />
       </div>
 
     </main>
