@@ -37,6 +37,12 @@ export default function HomePage() {
       // Simulate loading time
       const timer = setTimeout(() => {
         setIsLoading(false)
+        
+        // Show start button immediately after loading is complete
+        setTimeout(() => {
+          setShowStartButton(true)
+          playBeep()
+        }, 1000)
       }, 3000)
 
       const handleScroll = () => {
@@ -61,12 +67,6 @@ export default function HomePage() {
         } else {
           setScrollIndicatorOpacity(1)
           setShowScrollIndicator(true)
-        }
-
-        // Show start button when scrolled to a certain point
-        if (progress > 0.7 && !showStartButton) {
-          setShowStartButton(true)
-          playBeep() // Play beep sound when button appears
         }
       }
 
@@ -151,7 +151,7 @@ export default function HomePage() {
               shadow-mapSize-width={1024} 
               shadow-mapSize-height={1024} 
             />
-            <Environment preset="night" />
+            <Environment preset="city" />
 
             {isMounted && <CameraController scrollProgress={scrollProgress} />}
 
@@ -169,8 +169,8 @@ export default function HomePage() {
             {/* Enhanced post-processing effects with UnrealBloomPass-like bloom */}
             <EffectComposer>
               <Bloom 
-                intensity={2.0}        // Decreased intensity for less bloom
-                luminanceThreshold={0.4} // Higher threshold for more focused bloom
+                intensity={1.2}        // Further decreased intensity for less bloom
+                luminanceThreshold={0.6} // Higher threshold for more focused bloom
                 luminanceSmoothing={0.9}
                 height={300}
                 kernelSize={5}        // Larger kernel for better bloom spread
