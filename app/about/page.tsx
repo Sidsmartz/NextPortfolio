@@ -85,7 +85,7 @@ export default function AboutPage() {
               solutions using cutting-edge technologies.
             </p>
 
-            <div className="flex gap-4 mt-6">
+            <div className="flex flex-wrap gap-4 mt-6">
               <button
                 className="arcade-button px-4 py-2 rounded"
                 onClick={() => window.open("https://github.com/Sidsmartz", "_blank")}
@@ -94,9 +94,15 @@ export default function AboutPage() {
               </button>
               <button
                 className="arcade-button px-4 py-2 rounded"
-                onClick={() => window.open("https://linkedin.com/in/SiddharthTS", "_blank")}
+                onClick={() => window.open("https://www.linkedin.com/in/siddharth-t-s-a76655248/", "_blank")}
               >
                 LinkedIn
+              </button>
+              <button
+                className="arcade-button px-4 py-2 rounded"
+                onClick={() => window.open("https://leetcode.com/Sidsmartz", "_blank")}
+              >
+                LeetCode
               </button>
             </div>
           </motion.div>

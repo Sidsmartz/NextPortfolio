@@ -14,9 +14,11 @@ const retroFont = Press_Start_2P({
 })
 
 export const metadata: Metadata = {
-  title: "Arcade Experience",
-  description: "An immersive arcade experience with 3D and transitions",
-  generator: 'v0.dev',
+  title: "Siddharth's Portfolio",
+  description: "Siddharth T S - Developer Portfolio | Interactive arcade-themed portfolio showcasing my skills, projects, and experience",
+  generator: 'Next.js',
+  keywords: ["developer", "portfolio", "software engineer", "web developer", "coding", "arcade", "retro", "Siddharth T S"],
+  authors: [{ name: "Siddharth T S" }],
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
 

@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import { createPixelTransition } from "@/lib/transition-effect"
 import { useRouter } from "next/navigation"
+import PageTransition from "@/components/page-transition"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -50,29 +51,15 @@ export default function Navbar() {
           ARCADE PORTFOLIO
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation with Pixel Transition */}
         <nav className="hidden md:flex space-x-6">
           {navItems.map((item) => (
-            <Link
+            <PageTransition 
               key={item.path}
               href={item.path}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation(item.path)
-              }}
-              className={`font-retro text-sm relative ${
-                pathname === item.path ? "text-red-500" : "text-gray-400 hover:text-white"
-              }`}
-            >
-              {pathname === item.path && (
-                <motion.span
-                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-red-500"
-                  layoutId="navbar-indicator"
-                  transition={{ type: "spring", duration: 0.6 }}
-                />
-              )}
-              {item.name}
-            </Link>
+              label={item.name}
+              className="text-sm"
+            />
           ))}
         </nav>
 

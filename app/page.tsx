@@ -1,10 +1,10 @@
 "use client"
 
-import { useRef, useState, useEffect, Suspense } from "react"
+import { useRef, useState, useEffect, Suspense, useMemo } from "react"
 import { Canvas, useThree, useFrame } from "@react-three/fiber"
 import { Environment } from "@react-three/drei"
-import { EffectComposer, Bloom, Noise, Vignette, Scanline } from "@react-three/postprocessing"
-import { BlendFunction } from "postprocessing"
+import { EffectComposer, Bloom, Noise, Vignette, Scanline, DepthOfField } from "@react-three/postprocessing"
+import { BlendFunction, KernelSize } from "postprocessing"
 import RetroArcadeMachine from "@/components/retro-arcade-machine"
 import ArcadeScreen from "@/components/arcade-screen"
 import LoadingScreen from "@/components/loading-screen"
@@ -12,7 +12,7 @@ import { useArcadeSounds } from "@/hooks/use-arcade-sounds"
 import { useRouter } from "next/navigation"
 import { createPixelTransition } from "@/lib/transition-effect"
 import AudioPlayer from "@/components/audio-player"
-import type * as THREE from "three"
+import * as THREE from "three"
 
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -151,7 +151,13 @@ export default function HomePage() {
         <Canvas>
           <Suspense fallback={null}>
             <ambientLight intensity={0.4} />
-            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+            <spotLight 
+              position={[10, 10, 10]} 
+              angle={0.15} 
+              penumbra={1} 
+              intensity={1.5} 
+              castShadow
+            />
             <pointLight position={[-10, -10, -10]} />
             <directionalLight 
               position={[5, 5, 5]} 
@@ -166,27 +172,36 @@ export default function HomePage() {
 
             {isMounted && <RetroArcadeMachine position={[0, 0, 0]} rotation={[0, 0, 0]} />}
 
-            {/* Floor grid */}
-            {isMounted && <FloorGrid />}
+            {/* Floor grid with stronger glow */}
+            {isMounted && <FloorGrid enhanced={true} />}
 
-            {/* Vertical grid behind arcade machine - made larger */}
-            {isMounted && <VerticalGrid />}
+            {/* Vertical grid behind arcade machine with stronger glow */}
+            {isMounted && <VerticalGrid enhanced={true} />}
+
+            {/* Add particle system for ambient particles */}
+            {isMounted && !isMobile && <ParticleSystem />}
 
             {/* Always render ArcadeScreen but control visibility with opacity */}
             {isMounted && <ArcadeScreen onClick={handleStartClick} visible={showStartButton} />}
 
-            {/* Enhanced post-processing effects with UnrealBloomPass-like bloom */}
-            <EffectComposer enabled={!isMobile}>
-              <Bloom 
-                intensity={isMobile ? 0.8 : 1.2}
-                luminanceThreshold={0.6}
-                luminanceSmoothing={0.9}
-                height={isMobile ? 150 : 300}
-                kernelSize={isMobile ? 3 : 5}
+            {/* Enhanced post-processing effects with enhanced bloom */}
+            <EffectComposer enabled={true}>
+              <DepthOfField 
+                focusDistance={0} 
+                focalLength={0.02} 
+                bokehScale={2} 
+                height={480} 
               />
-              <Noise opacity={isMobile ? 0.08 : 0.12} blendFunction={BlendFunction.OVERLAY} />
-              <Scanline density={isMobile ? 1.5 : 2.5} opacity={isMobile ? 0.15 : 0.2} blendFunction={BlendFunction.OVERLAY} />
-              <Vignette eskil={false} offset={0.1} darkness={0.7} blendFunction={BlendFunction.NORMAL} />
+              <Bloom 
+                intensity={isMobile ? 1.5 : 2.5}
+                luminanceThreshold={0.2} 
+                luminanceSmoothing={0.9}
+                height={isMobile ? 200 : 400}
+                kernelSize={KernelSize.HUGE}
+              />
+              <Noise opacity={isMobile ? 0.07 : 0.09} blendFunction={BlendFunction.OVERLAY} />
+              <Scanline density={2} opacity={isMobile ? 0.1 : 0.15} blendFunction={BlendFunction.OVERLAY} />
+              <Vignette eskil={false} offset={0.1} darkness={0.8} blendFunction={BlendFunction.NORMAL} />
             </EffectComposer>
           </Suspense>
         </Canvas>
@@ -291,29 +306,29 @@ function PerspectiveCamera({
 }
 
 // Floor grid component
-function FloorGrid() {
+function FloorGrid({ enhanced = false }: { enhanced?: boolean }) {
   const gridRef = useRef<THREE.Mesh>(null)
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   useFrame((state) => {
     if (gridRef.current && gridRef.current.material) {
       const material = gridRef.current.material as THREE.MeshStandardMaterial
-      // Reduce animation intensity on mobile for better performance
-      const animationIntensity = isMobile ? 0.1 : 0.2
-      material.emissiveIntensity = 0.5 + Math.sin(state.clock.getElapsedTime() * 0.5) * animationIntensity
+      // Increased animation intensity for enhanced mode
+      const animationIntensity = enhanced ? (isMobile ? 0.25 : 0.4) : (isMobile ? 0.1 : 0.2)
+      material.emissiveIntensity = 0.7 + Math.sin(state.clock.getElapsedTime() * 0.5) * animationIntensity
     }
   })
 
   // Reduce grid divisions on mobile for better performance
-  const gridDivisions = isMobile ? 25 : 50
+  const gridDivisions = isMobile ? 25 : (enhanced ? 60 : 50)
 
   return (
     <mesh ref={gridRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]} receiveShadow>
       <planeGeometry args={[50, 50, gridDivisions, gridDivisions]} />
       <meshStandardMaterial
         color="#ff0000"
-        emissive="#ff0000"
-        emissiveIntensity={0.5}
+        emissive="#ff3333"
+        emissiveIntensity={enhanced ? 0.8 : 0.5}
         wireframe
         transparent
         opacity={isMobile ? 0.2 : 0.3} // Reduce opacity on mobile
@@ -323,33 +338,85 @@ function FloorGrid() {
 }
 
 // Vertical grid component
-function VerticalGrid() {
+function VerticalGrid({ enhanced = false }: { enhanced?: boolean }) {
   const gridRef = useRef<THREE.Mesh>(null)
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   useFrame((state) => {
     if (gridRef.current && gridRef.current.material) {
       const material = gridRef.current.material as THREE.MeshStandardMaterial
-      // Reduce animation intensity on mobile for better performance
-      const animationIntensity = isMobile ? 0.1 : 0.2
-      material.emissiveIntensity = 0.5 + Math.sin(state.clock.getElapsedTime() * 0.5) * animationIntensity
+      // Increased animation intensity for enhanced mode
+      const animationIntensity = enhanced ? (isMobile ? 0.25 : 0.4) : (isMobile ? 0.1 : 0.2)
+      material.emissiveIntensity = 0.7 + Math.sin(state.clock.getElapsedTime() * 0.5) * animationIntensity
     }
   })
 
   // Reduce grid divisions on mobile for better performance
-  const gridDivisions = isMobile ? 25 : 100
+  const gridDivisions = isMobile ? 25 : (enhanced ? 120 : 100)
 
   return (
     <mesh ref={gridRef} position={[0, 0, -10]} rotation={[0, 0, 0]}>
-      <planeGeometry args={[100, 50, gridDivisions, gridDivisions / 2]} /> {/* Made grid wider and taller, but fewer divisions on mobile */}
+      <planeGeometry args={[100, 50, gridDivisions, gridDivisions / 2]} />
       <meshStandardMaterial
         color="#ff0000"
-        emissive="#ff0000"
-        emissiveIntensity={0.5}
+        emissive="#ff3333"
+        emissiveIntensity={enhanced ? 0.8 : 0.5}
         wireframe
         transparent
         opacity={isMobile ? 0.15 : 0.2} // Reduce opacity on mobile
       />
     </mesh>
   )
+}
+
+// Simple particle system for desktop only
+function ParticleSystem() {
+  const points = useRef<THREE.Points>(null);
+  const particleCount = 50;
+  
+  // Generate random particle positions
+  const particlePositions = useMemo(() => {
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      positions[i3] = (Math.random() - 0.5) * 15;
+      positions[i3 + 1] = Math.random() * 10;
+      positions[i3 + 2] = (Math.random() - 0.5) * 15;
+    }
+    return positions;
+  }, [particleCount]);
+  
+  useFrame((state) => {
+    if (points.current) {
+      points.current.rotation.y += 0.001;
+      const positions = (points.current.geometry as THREE.BufferGeometry).attributes.position.array as Float32Array;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        positions[i3 + 1] += Math.sin(state.clock.getElapsedTime() * 0.2 + i * 0.1) * 0.01;
+      }
+      
+      (points.current.geometry as THREE.BufferGeometry).attributes.position.needsUpdate = true;
+    }
+  });
+  
+  return (
+    <points ref={points}>
+      <bufferGeometry>
+        <bufferAttribute 
+          attach="attributes-position" 
+          args={[particlePositions, 3]}
+          count={particleCount} 
+          itemSize={3} 
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.1}
+        color="#ff3333"
+        transparent
+        opacity={0.8}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
 }

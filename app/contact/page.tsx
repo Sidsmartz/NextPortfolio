@@ -6,7 +6,7 @@ import MatrixTextEffect from "@/components/matrix-text-effect"
 import LoadingScreen from "@/components/loading-screen"
 import ContactForm from "@/components/contact-form"
 import Squares from "@/components/squares"
-import { Github, Linkedin, Twitter } from "lucide-react"
+import { Github, Linkedin, Instagram, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ContactPage() {
@@ -87,6 +87,7 @@ export default function ContactPage() {
                 variant="outline"
                 size="icon"
                 className="rounded-full border-red-500 text-red-500 hover:bg-red-900/20"
+                onClick={() => window.open("https://github.com/Sidsmartz", "_blank")}
               >
                 <Github className="h-5 w-5" />
               </Button>
@@ -94,6 +95,7 @@ export default function ContactPage() {
                 variant="outline"
                 size="icon"
                 className="rounded-full border-red-500 text-red-500 hover:bg-red-900/20"
+                onClick={() => window.open("https://www.linkedin.com/in/siddharth-t-s-a76655248/", "_blank")}
               >
                 <Linkedin className="h-5 w-5" />
               </Button>
@@ -101,14 +103,28 @@ export default function ContactPage() {
                 variant="outline"
                 size="icon"
                 className="rounded-full border-red-500 text-red-500 hover:bg-red-900/20"
+                onClick={() => window.open("https://www.instagram.com/sidsmartz._.gamez", "_blank")}
               >
-                <Twitter className="h-5 w-5" />
+                <Instagram className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full border-red-500 text-red-500 hover:bg-red-900/20"
+                onClick={() => {
+                  navigator.clipboard.writeText("Sidsmartz");
+                  alert("Discord username copied to clipboard: Sidsmartz");
+                }}
+              >
+                <MessageSquare className="h-5 w-5" />
               </Button>
             </div>
 
             <div className="space-y-2 text-gray-300">
               <p>📍 Hyderabad, India</p>
               <p>📧 siddhartht4206@gmail.com</p>
+              <p>📱 Instagram: sidsmartz._.gamez</p>
+              <p>💬 Discord: Sidsmartz</p>
             </div>
           </motion.div>
 
