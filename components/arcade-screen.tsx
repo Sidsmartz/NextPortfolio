@@ -17,6 +17,18 @@ export default function ArcadeScreen({
   const [textVisible, setTextVisible] = useState(false)
   const screenRef = useRef<THREE.Mesh>(null)
   const staticRef = useRef<THREE.Mesh>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Animate text appearing from bottom when visible prop changes
   useEffect(() => {
@@ -69,17 +81,17 @@ export default function ArcadeScreen({
       {/* Screen content */}
       <Html
         transform
-        distanceFactor={0.5}
+        distanceFactor={isMobile ? 0.6 : 0.5} // Adjust distance factor on mobile
         position={[0, 1.3, 0.43]}
         style={{
-          width: "320px", /* Increased width to avoid cutoff */
-          height: "260px", /* Increased height to avoid cutoff */
+          width: isMobile ? "280px" : "320px", /* Adjust width for mobile */
+          height: isMobile ? "240px" : "260px", /* Adjust height for mobile */
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           overflow: "hidden",
-          padding: "20px 10px", /* Added more vertical padding */
+          padding: isMobile ? "15px 5px" : "20px 10px", /* Reduced padding on mobile */
           opacity: visible ? 1 : 0,
           pointerEvents: visible ? "auto" : "none",
           transition: "opacity 0.5s ease",
@@ -92,9 +104,9 @@ export default function ArcadeScreen({
           style={{
             color: "#ff6666",
             textShadow: "0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 15px #ff0000, 0 0 20px #ff0000, 0 0 25px #ff0000", /* Enhanced glow but same color */
-            fontSize: "42px", /* Slightly reduced to avoid overflow */
+            fontSize: isMobile ? "36px" : "42px", /* Smaller font on mobile */
             fontFamily: "var(--font-retro)",
-            letterSpacing: "1px",
+            letterSpacing: isMobile ? "0px" : "1px", /* Reduced letter spacing on mobile */
             lineHeight: "1.2", /* Reduced line height to fit better */
             textTransform: "uppercase",
             fontWeight: "bold",

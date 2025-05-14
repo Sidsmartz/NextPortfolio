@@ -22,6 +22,7 @@ export default function HomePage() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [showScrollIndicator, setShowScrollIndicator] = useState(true)
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1)
+  const [isMobile, setIsMobile] = useState(false)
   const router = useRouter()
 
   // Initialize sound effects
@@ -30,6 +31,13 @@ export default function HomePage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsMounted(true)
+      setIsMobile(window.innerWidth < 768)
+
+      // Listen for window resizes to update mobile status
+      const handleResize = () => {
+        setIsMobile(window.innerWidth < 768)
+      }
+      window.addEventListener('resize', handleResize)
 
       // Start ambient sound when component mounts
       playAmbient()
@@ -73,6 +81,7 @@ export default function HomePage() {
       window.addEventListener("scroll", handleScroll)
       return () => {
         window.removeEventListener("scroll", handleScroll)
+        window.removeEventListener('resize', handleResize)
         clearTimeout(timer)
       }
     }
@@ -148,12 +157,12 @@ export default function HomePage() {
               position={[5, 5, 5]} 
               intensity={1.5} 
               castShadow 
-              shadow-mapSize-width={1024} 
-              shadow-mapSize-height={1024} 
+              shadow-mapSize-width={isMobile ? 512 : 1024}
+              shadow-mapSize-height={isMobile ? 512 : 1024}
             />
             <Environment preset="city" />
 
-            {isMounted && <CameraController scrollProgress={scrollProgress} />}
+            {isMounted && <CameraController scrollProgress={scrollProgress} isMobile={isMobile} />}
 
             {isMounted && <RetroArcadeMachine position={[0, 0, 0]} rotation={[0, 0, 0]} />}
 
@@ -167,25 +176,25 @@ export default function HomePage() {
             {isMounted && <ArcadeScreen onClick={handleStartClick} visible={showStartButton} />}
 
             {/* Enhanced post-processing effects with UnrealBloomPass-like bloom */}
-            <EffectComposer>
+            <EffectComposer enabled={!isMobile}>
               <Bloom 
-                intensity={1.2}        // Further decreased intensity for less bloom
-                luminanceThreshold={0.6} // Higher threshold for more focused bloom
+                intensity={isMobile ? 0.8 : 1.2}
+                luminanceThreshold={0.6}
                 luminanceSmoothing={0.9}
-                height={300}
-                kernelSize={5}        // Larger kernel for better bloom spread
+                height={isMobile ? 150 : 300}
+                kernelSize={isMobile ? 3 : 5}
               />
-              <Noise opacity={0.12} blendFunction={BlendFunction.OVERLAY} />
-              <Scanline density={2.5} opacity={0.2} blendFunction={BlendFunction.OVERLAY} />
+              <Noise opacity={isMobile ? 0.08 : 0.12} blendFunction={BlendFunction.OVERLAY} />
+              <Scanline density={isMobile ? 1.5 : 2.5} opacity={isMobile ? 0.15 : 0.2} blendFunction={BlendFunction.OVERLAY} />
               <Vignette eskil={false} offset={0.1} darkness={0.7} blendFunction={BlendFunction.NORMAL} />
             </EffectComposer>
           </Suspense>
         </Canvas>
       </div>
 
-      {/* Enhanced CRT and scanline effects */}
-      <div className="crt-effect"></div>
-      <div className="scanlines"></div>
+      {/* Enhanced CRT and scanline effects - reduce opacity on mobile */}
+      <div className="crt-effect" style={{ opacity: isMobile ? 0.5 : 1 }}></div>
+      <div className="scanlines" style={{ opacity: isMobile ? 0.3 : 0.4 }}></div>
 
       {/* Audio player */}
       <div className="fixed bottom-4 right-4 z-50">
@@ -211,7 +220,7 @@ export default function HomePage() {
 }
 
 // Component to control camera based on scroll
-function CameraController({ scrollProgress }: { scrollProgress: number }) {
+function CameraController({ scrollProgress, isMobile }: { scrollProgress: number; isMobile: boolean }) {
   const cameraRef = useRef({
     position: { x: 5, y: 1, z: 5 },
     lookAt: { x: 0, y: 1, z: 0 },
@@ -221,15 +230,19 @@ function CameraController({ scrollProgress }: { scrollProgress: number }) {
     // Initial setup happens in useThree
   }, [])
 
+  // Adjust camera position for mobile to ensure arcade machine is centered
+  const mobileXOffset = isMobile ? 0.5 : 0 // Move slightly to the left on mobile
+  const mobileZDistance = isMobile ? 6 : 5 // Start further back on mobile
+
   return (
     <PerspectiveCamera
       makeDefault
       position={[
-        5 - scrollProgress * 5, // Move from x=5 to x=0
+        mobileXOffset + (5 - scrollProgress * 5), // Move from x=5 to x=0, adjusted for mobile
         1 + scrollProgress * 0.3, // Move from y=1 to y=1.3
-        5 - scrollProgress * 3.5, // Move from z=5 to z=1.5
+        mobileZDistance - scrollProgress * (isMobile ? 4 : 3.5), // Adjusted distance based on device
       ]}
-      fov={30}
+      fov={isMobile ? 35 : 30} // Wider field of view on mobile
       near={0.1}
       far={100}
       lookAt={[0, 1.3, 0]} // Always look at the arcade screen
@@ -260,10 +273,14 @@ function PerspectiveCamera({
       // Set camera properties
       camera.position.set(...position)
       camera.lookAt(...lookAt)
-      camera.fov = fov
-      camera.near = near
-      camera.far = far
-      camera.updateProjectionMatrix()
+      
+      // Fix for typecasting since we know this is a PerspectiveCamera
+      if ('fov' in camera) {
+        (camera as THREE.PerspectiveCamera).fov = fov;
+        (camera as THREE.PerspectiveCamera).near = near;
+        (camera as THREE.PerspectiveCamera).far = far;
+        camera.updateProjectionMatrix();
+      }
 
       // Make this the default camera
       set({ camera })
@@ -276,24 +293,30 @@ function PerspectiveCamera({
 // Floor grid component
 function FloorGrid() {
   const gridRef = useRef<THREE.Mesh>(null)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   useFrame((state) => {
     if (gridRef.current && gridRef.current.material) {
       const material = gridRef.current.material as THREE.MeshStandardMaterial
-      material.emissiveIntensity = 0.5 + Math.sin(state.clock.getElapsedTime() * 0.5) * 0.2
+      // Reduce animation intensity on mobile for better performance
+      const animationIntensity = isMobile ? 0.1 : 0.2
+      material.emissiveIntensity = 0.5 + Math.sin(state.clock.getElapsedTime() * 0.5) * animationIntensity
     }
   })
 
+  // Reduce grid divisions on mobile for better performance
+  const gridDivisions = isMobile ? 25 : 50
+
   return (
     <mesh ref={gridRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]} receiveShadow>
-      <planeGeometry args={[50, 50, 50, 50]} />
+      <planeGeometry args={[50, 50, gridDivisions, gridDivisions]} />
       <meshStandardMaterial
         color="#ff0000"
         emissive="#ff0000"
         emissiveIntensity={0.5}
         wireframe
         transparent
-        opacity={0.3}
+        opacity={isMobile ? 0.2 : 0.3} // Reduce opacity on mobile
       />
     </mesh>
   )
@@ -302,24 +325,30 @@ function FloorGrid() {
 // Vertical grid component
 function VerticalGrid() {
   const gridRef = useRef<THREE.Mesh>(null)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   useFrame((state) => {
     if (gridRef.current && gridRef.current.material) {
       const material = gridRef.current.material as THREE.MeshStandardMaterial
-      material.emissiveIntensity = 0.5 + Math.sin(state.clock.getElapsedTime() * 0.5) * 0.2
+      // Reduce animation intensity on mobile for better performance
+      const animationIntensity = isMobile ? 0.1 : 0.2
+      material.emissiveIntensity = 0.5 + Math.sin(state.clock.getElapsedTime() * 0.5) * animationIntensity
     }
   })
 
+  // Reduce grid divisions on mobile for better performance
+  const gridDivisions = isMobile ? 25 : 100
+
   return (
     <mesh ref={gridRef} position={[0, 0, -10]} rotation={[0, 0, 0]}>
-      <planeGeometry args={[100, 50, 100, 50]} /> {/* Made grid wider and taller */}
+      <planeGeometry args={[100, 50, gridDivisions, gridDivisions / 2]} /> {/* Made grid wider and taller, but fewer divisions on mobile */}
       <meshStandardMaterial
         color="#ff0000"
         emissive="#ff0000"
         emissiveIntensity={0.5}
         wireframe
         transparent
-        opacity={0.2}
+        opacity={isMobile ? 0.15 : 0.2} // Reduce opacity on mobile
       />
     </mesh>
   )
