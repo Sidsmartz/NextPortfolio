@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import MatrixTextEffect from "@/components/matrix-text-effect"
 import LoadingScreen from "@/components/loading-screen"
 import { Terminal } from "@/components/terminal/terminal"
 import ProjectCard from "@/components/project-card"
 import { Button } from "@/components/ui/button"
-import { TerminalIcon, ExternalLink } from "lucide-react"
+import { TerminalIcon, ExternalLink, Volume2, VolumeX } from "lucide-react"
+import ProjectAudioManager from "@/components/project-audio-manager"
 
 export default function ProjectsPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -16,6 +17,8 @@ export default function ProjectsPage() {
   const [progressInterval, setProgressInterval] = useState<NodeJS.Timeout | null>(null)
   const [showProjectImage, setShowProjectImage] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [audioEnabled, setAudioEnabled] = useState(true)
+  const terminalContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Check for mobile devices
@@ -55,6 +58,12 @@ export default function ProjectsPage() {
 
     document.addEventListener("mousemove", updateCursor)
 
+    // Load audio preferences from localStorage if available
+    const savedAudioPreference = localStorage.getItem('projectsAudioEnabled')
+    if (savedAudioPreference !== null) {
+      setAudioEnabled(savedAudioPreference === 'true')
+    }
+
     return () => {
       window.removeEventListener('resize', checkMobile)
       document.removeEventListener("mousemove", updateCursor)
@@ -70,6 +79,13 @@ export default function ProjectsPage() {
       clearTimeout(timer)
     }
   }, [progressInterval])
+
+  // Toggle audio function
+  const toggleAudio = useCallback(() => {
+    const newState = !audioEnabled
+    setAudioEnabled(newState)
+    localStorage.setItem('projectsAudioEnabled', newState.toString())
+  }, [audioEnabled])
 
   const startDemo = useCallback(() => {
     setIsRunning(true)
@@ -96,7 +112,17 @@ export default function ProjectsPage() {
 
     // Store the interval ID
     setProgressInterval(interval)
-  }, [progressInterval])
+
+    // Auto-scroll to terminal section on mobile
+    if (isMobile && terminalContainerRef.current) {
+      setTimeout(() => {
+        terminalContainerRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }, 100)
+    }
+  }, [progressInterval, isMobile])
 
   // Auto-run the first project demo when page loads
   useEffect(() => {
@@ -401,6 +427,27 @@ export default function ProjectsPage() {
 
   return (
     <div className="page-container pb-20">
+      {/* Audio Manager Component */}
+      {audioEnabled && (
+        <ProjectAudioManager 
+          activeProject={activeProject}
+          isRunning={isRunning}
+          progress={progress}
+        />
+      )}
+      
+      {/* Audio Toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleAudio}
+          className="border-red-500/30 text-red-500 hover:bg-red-900/20 rounded-full w-8 h-8 p-1"
+        >
+          {audioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+        </Button>
+      </div>
+
       <div className="page-header">
         <MatrixTextEffect
           phrases={["PROJECTS", "MY WORK", "PORTFOLIO", "CREATIONS", "INNOVATIONS"]}
@@ -461,7 +508,7 @@ export default function ProjectsPage() {
         </div>
 
         {/* Terminal Section */}
-        <div className="bg-gray-900 rounded-lg border border-red-500/30 overflow-hidden">
+        <div ref={terminalContainerRef} className="bg-gray-900 rounded-lg border border-red-500/30 overflow-hidden">
           <div className="border-b border-red-500/30 p-4 flex justify-between items-center flex-wrap">
             <div className="flex items-center">
               <TerminalIcon className="mr-2 h-5 w-5 text-red-500" />
@@ -479,7 +526,7 @@ export default function ProjectsPage() {
           </div>
 
           <div className={`p-0 ${isMobile ? 'h-[300px]' : 'h-[400px]'} overflow-auto custom-scrollbar`}>
-            <Terminal commands={activeProjectData?.commands || []} isRunning={isRunning} progress={progress} />
+            <Terminal commands={activeProjectData?.commands || []} isRunning={isRunning} progress={progress} autoScroll={true} />
           </div>
 
           <div className="border-t border-red-500/30 p-4 flex justify-between items-center">
