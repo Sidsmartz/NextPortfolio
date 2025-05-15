@@ -15,8 +15,20 @@ export default function ProjectsPage() {
   const [progress, setProgress] = useState(0)
   const [progressInterval, setProgressInterval] = useState<NodeJS.Timeout | null>(null)
   const [showProjectImage, setShowProjectImage] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
+    // Check for mobile devices
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    // Initial check
+    checkMobile()
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile)
+    
     // Simulate loading time
     const timer = setTimeout(() => {
       setIsLoading(false)
@@ -44,6 +56,7 @@ export default function ProjectsPage() {
     document.addEventListener("mousemove", updateCursor)
 
     return () => {
+      window.removeEventListener('resize', checkMobile)
       document.removeEventListener("mousemove", updateCursor)
       if (document.body.contains(cursor)) {
         document.body.removeChild(cursor)
@@ -309,7 +322,7 @@ export default function ProjectsPage() {
       title: "HosteLite",
       description: "A digital hostel management tool streamlining attendance, out-pass tracking and admin approvals.",
       tags: ["React", "Node.js", "Real-time Database", "MongoDB"],
-      image: "",
+      image: "/hostelite.png",
       link: "https://github.com/Sidsmartz/HosteLite-RTP",
       commands: [
         "# HosteLite - Hostel Management System",
@@ -387,7 +400,7 @@ export default function ProjectsPage() {
   const activeProjectData = projects.find((p) => p.id === activeProject)
 
   return (
-    <div className="page-container">
+    <div className="page-container pb-20">
       <div className="page-header">
         <MatrixTextEffect
           phrases={["PROJECTS", "MY WORK", "PORTFOLIO", "CREATIONS", "INNOVATIONS"]}
@@ -406,26 +419,26 @@ export default function ProjectsPage() {
 
         {/* Project Details Section */}
         <div className="bg-gray-900 rounded-lg border border-red-500/30 overflow-hidden mb-8">
-          <div className="border-b border-red-500/30 p-4 flex justify-between items-center">
+          <div className="border-b border-red-500/30 p-4 flex justify-between items-center flex-wrap">
             <div className="flex items-center">
               <h3 className="font-retro text-red-500">{activeProjectData?.title}</h3>
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="border-red-500 text-red-500 hover:bg-red-900/20"
+              className="border-red-500 text-red-500 hover:bg-red-900/20 mt-2 sm:mt-0"
               onClick={() => window.open(activeProjectData?.link, "_blank")}
             >
               View Project <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
           </div>
 
-          {showProjectImage && !isRunning && progress === 100 ? (
+          {showProjectImage && !isRunning && progress === 100 && activeProjectData?.image ? (
             <div className="p-4 flex justify-center">
               <div className="w-full max-w-4xl">
                 <img
-                  src={activeProjectData?.image}
-                  alt={activeProjectData?.title}
+                  src={activeProjectData.image}
+                  alt={activeProjectData.title}
                   className="w-full h-auto rounded-md border border-red-500/30 object-cover"
                 />
               </div>
@@ -449,7 +462,7 @@ export default function ProjectsPage() {
 
         {/* Terminal Section */}
         <div className="bg-gray-900 rounded-lg border border-red-500/30 overflow-hidden">
-          <div className="border-b border-red-500/30 p-4 flex justify-between items-center">
+          <div className="border-b border-red-500/30 p-4 flex justify-between items-center flex-wrap">
             <div className="flex items-center">
               <TerminalIcon className="mr-2 h-5 w-5 text-red-500" />
               <h3 className="font-retro text-red-500">Code Demo</h3>
@@ -459,13 +472,13 @@ export default function ProjectsPage() {
               size="sm"
               onClick={startDemo}
               disabled={isRunning}
-              className="border-red-500 text-red-500 hover:bg-red-900/20"
+              className="border-red-500 text-red-500 hover:bg-red-900/20 mt-2 sm:mt-0"
             >
               Run Demo
             </Button>
           </div>
 
-          <div className="p-0 h-[400px] overflow-auto custom-scrollbar">
+          <div className={`p-0 ${isMobile ? 'h-[300px]' : 'h-[400px]'} overflow-auto custom-scrollbar`}>
             <Terminal commands={activeProjectData?.commands || []} isRunning={isRunning} progress={progress} />
           </div>
 
@@ -478,8 +491,8 @@ export default function ProjectsPage() {
       </div>
 
       {/* CRT and scanline effects */}
-      <div className="crt-effect"></div>
-      <div className="scanlines"></div>
+      <div className="crt-effect" style={{ opacity: isMobile ? 0.3 : 1 }}></div>
+      <div className="scanlines" style={{ opacity: isMobile ? 0.2 : 0.4 }}></div>
     </div>
   )
 }
