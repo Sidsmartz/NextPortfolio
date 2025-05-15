@@ -102,8 +102,8 @@ export default function ProjectsPage() {
       title: "Codesense",
       description: "A competitive coding leaderboard app aggregating data across platforms with 600+ active users.",
       tags: ["React", "Next.js", "AWS", "MongoDB"],
-      image: "/placeholder.svg?height=300&width=500",
-      link: "#",
+      image: "/codesense.png",
+      link: "https://github.com/KeEbEe123/CodeSense",
       commands: [
         "# Codesense - Competitive Coding Leaderboard",
         "# Initializing Next.js application...",
@@ -162,8 +162,8 @@ export default function ProjectsPage() {
       description:
         "A Chrome Extension to detect phishing links and deepfake content using NLP and HuggingFace Transformers.",
       tags: ["Flask", "Chrome Extension", "HuggingFace", "AWS"],
-      image: "/placeholder.svg?height=300&width=500",
-      link: "#",
+      image: "/fishy.png",
+      link: "https://github.com/Sidsmartz/Fishy_MGIT_HackSavvy",
       commands: [
         "# Fishy - Phishing & Deepfake Detection",
         "# Setting up Flask backend...",
@@ -233,8 +233,8 @@ export default function ProjectsPage() {
       title: "Smart Traffic Management System",
       description: "A real-time smart lane management model using object detection and ML Classification techniques.",
       tags: ["TensorFlow", "Unity", "PyTorch", "Python"],
-      image: "/placeholder.svg?height=300&width=500",
-      link: "#",
+      image: "/trafficml.png",
+      link: "https://github.com/Sidsmartz/SIH---Traffic-Management-System",
       commands: [
         "# Smart Traffic Management System",
         "# Importing libraries...",
@@ -309,8 +309,8 @@ export default function ProjectsPage() {
       title: "HosteLite",
       description: "A digital hostel management tool streamlining attendance, out-pass tracking and admin approvals.",
       tags: ["React", "Node.js", "Real-time Database", "MongoDB"],
-      image: "/placeholder.svg?height=300&width=500",
-      link: "#",
+      image: "",
+      link: "https://github.com/Sidsmartz/HosteLite-RTP",
       commands: [
         "# HosteLite - Hostel Management System",
         "# Setting up React frontend...",
@@ -424,7 +424,7 @@ export default function ProjectsPage() {
             <div className="p-4 flex justify-center">
               <div className="w-full max-w-4xl">
                 <img
-                  src={activeProjectData?.image || "/placeholder.svg"}
+                  src={activeProjectData?.image}
                   alt={activeProjectData?.title}
                   className="w-full h-auto rounded-md border border-red-500/30 object-cover"
                 />
