@@ -21,6 +21,7 @@ const config = {
     extend: {
       fontFamily: {
         retro: ["var(--font-retro)", "monospace"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

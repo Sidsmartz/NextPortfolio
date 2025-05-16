@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useEffect, Suspense, useMemo } from "react"
+import { useRef, useState, useEffect, Suspense, useMemo, useCallback } from "react"
 import { Canvas, useThree, useFrame } from "@react-three/fiber"
 import { Environment } from "@react-three/drei"
 import { EffectComposer, Bloom, Noise, Vignette, Scanline, DepthOfField } from "@react-three/postprocessing"
@@ -20,13 +20,102 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showStartButton, setShowStartButton] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true)
-  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1)
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false)
+  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false)
+  const [scrollDirection, setScrollDirection] = useState<'down' | 'up' | null>(null)
+  const lastScrollY = useRef(0)
   const router = useRouter()
 
   // Initialize sound effects
   const { playAmbient, playBeep, playStart } = useArcadeSounds()
+
+  const smoothScrollTo = (targetY: number, duration: number) => {
+    const startY = window.scrollY
+    const difference = targetY - startY
+    const startTime = performance.now()
+
+    const easeInOutCubic = (t: number) => {
+      return t < 0.5 
+        ? 4 * t * t * t 
+        : 1 - Math.pow(-2 * t + 2, 3) / 2
+    }
+
+    const animation = (currentTime: number) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+
+      const easedProgress = easeInOutCubic(progress)
+      window.scrollTo({
+        top: startY + difference * easedProgress,
+        behavior: 'auto' // Use auto to prevent conflict with smooth scroll
+      })
+
+      if (progress < 1) {
+        requestAnimationFrame(animation)
+      } else {
+        setTimeout(() => {
+          setIsAutoScrolling(false)
+        }, 50) // Small delay to prevent immediate scroll trigger
+      }
+    }
+
+    setIsAutoScrolling(true)
+    requestAnimationFrame(animation)
+  }
+
+  // Handle initial scroll indicator state after mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Show scroll indicator if we're at the top
+      if (window.scrollY === 0) {
+        setShowScrollIndicator(true)
+        setScrollIndicatorOpacity(1)
+      }
+    }
+  }, [])
+
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current || isAutoScrolling) return
+
+    const currentScrollY = window.scrollY
+    const windowHeight = window.innerHeight
+    const documentHeight = document.body.scrollHeight - windowHeight
+    const scrollDelta = currentScrollY - lastScrollY.current
+
+    // Determine scroll direction
+    if (Math.abs(scrollDelta) > 5) {
+      const newDirection = scrollDelta > 0 ? 'down' : 'up'
+      
+      if (newDirection !== scrollDirection) {
+        setScrollDirection(newDirection)
+        setIsAutoScrolling(true)
+
+        // Auto-scroll to target position
+        if (newDirection === 'down') {
+          smoothScrollTo(documentHeight, 1000)
+        } else {
+          smoothScrollTo(0, 1000)
+        }
+      }
+    }
+
+    lastScrollY.current = currentScrollY
+
+    // Calculate scroll progress (0 to 1) - Invert the progress
+    const progress = 1 - Math.min(currentScrollY / documentHeight, 1)
+    setScrollProgress(progress)
+
+    // Show scroll indicator when at the top, hide when scrolling
+    if (currentScrollY === 0) {
+      setShowScrollIndicator(true)
+      setScrollIndicatorOpacity(1)
+    } else {
+      setShowScrollIndicator(false)
+      setScrollIndicatorOpacity(0)
+    }
+  }, [isAutoScrolling, scrollDirection])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -53,31 +142,6 @@ export default function HomePage() {
         }, 1000)
       }, 3000)
 
-      const handleScroll = () => {
-        if (!containerRef.current) return
-
-        const scrollY = window.scrollY
-        const windowHeight = window.innerHeight
-        const documentHeight = document.body.scrollHeight - windowHeight
-
-        // Calculate scroll progress (0 to 1)
-        const progress = Math.min(scrollY / documentHeight, 1)
-        setScrollProgress(progress)
-
-        // Gradually fade out scroll indicator based on scroll progress
-        const fadeOutStart = 0.1 // Start fading at 10% scroll
-        const fadeOutEnd = 0.5 // Completely faded at 50% scroll
-
-        if (progress > fadeOutStart) {
-          const opacity = Math.max(0, 1 - (progress - fadeOutStart) / (fadeOutEnd - fadeOutStart))
-          setScrollIndicatorOpacity(opacity)
-          if (opacity < 0.05) setShowScrollIndicator(false)
-        } else {
-          setScrollIndicatorOpacity(1)
-          setShowScrollIndicator(true)
-        }
-      }
-
       window.addEventListener("scroll", handleScroll)
       return () => {
         window.removeEventListener("scroll", handleScroll)
@@ -85,7 +149,7 @@ export default function HomePage() {
         clearTimeout(timer)
       }
     }
-  }, [showStartButton, playAmbient, playBeep])
+  }, [showStartButton, playAmbient, playBeep, handleScroll])
 
   const handleStartClick = () => {
     console.log("Start button clicked, initiating transition")
@@ -236,71 +300,42 @@ export default function HomePage() {
 
 // Component to control camera based on scroll
 function CameraController({ scrollProgress, isMobile }: { scrollProgress: number; isMobile: boolean }) {
+  const { camera } = useThree()
   const cameraRef = useRef({
-    position: { x: 5, y: 1, z: 5 },
-    lookAt: { x: 0, y: 1, z: 0 },
+    currentProgress: 0
   })
-
-  useEffect(() => {
-    // Initial setup happens in useThree
-  }, [])
 
   // Adjust camera position for mobile to ensure arcade machine is centered
   const mobileXOffset = isMobile ? 0.5 : 0 // Move slightly to the left on mobile
   const mobileZDistance = isMobile ? 6 : 5 // Start further back on mobile
 
-  return (
-    <PerspectiveCamera
-      makeDefault
-      position={[
-        mobileXOffset + (5 - scrollProgress * 5), // Move from x=5 to x=0, adjusted for mobile
-        1 + scrollProgress * 0.3, // Move from y=1 to y=1.3
-        mobileZDistance - scrollProgress * (isMobile ? 4 : 3.5), // Adjusted distance based on device
-      ]}
-      fov={isMobile ? 35 : 30} // Wider field of view on mobile
-      near={0.1}
-      far={100}
-      lookAt={[0, 1.3, 0]} // Always look at the arcade screen
-    />
-  )
-}
-
-// Custom PerspectiveCamera component
-function PerspectiveCamera({
-  position,
-  lookAt,
-  fov,
-  near,
-  far,
-  makeDefault = false,
-}: {
-  position: [number, number, number]
-  lookAt: [number, number, number]
-  fov: number
-  near: number
-  far: number
-  makeDefault?: boolean
-}) {
-  const { camera, set } = useThree()
-
   useEffect(() => {
-    if (makeDefault) {
-      // Set camera properties
-      camera.position.set(...position)
-      camera.lookAt(...lookAt)
-      
-      // Fix for typecasting since we know this is a PerspectiveCamera
-      if ('fov' in camera) {
-        (camera as THREE.PerspectiveCamera).fov = fov;
-        (camera as THREE.PerspectiveCamera).near = near;
-        (camera as THREE.PerspectiveCamera).far = far;
-        camera.updateProjectionMatrix();
-      }
-
-      // Make this the default camera
-      set({ camera })
+    // Set initial camera properties
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = isMobile ? 35 : 30
+      camera.near = 0.1
+      camera.far = 100
+      camera.updateProjectionMatrix()
     }
-  }, [camera, position, lookAt, fov, near, far, set, makeDefault])
+  }, [camera, isMobile])
+
+  useFrame(() => {
+    // Smoothly interpolate the progress
+    cameraRef.current.currentProgress += (scrollProgress - cameraRef.current.currentProgress) * 0.05
+
+    const progress = cameraRef.current.currentProgress
+
+    // Calculate target positions
+    const targetX = mobileXOffset + (5 - progress * 5)
+    const targetY = 1 + progress * 0.3
+    const targetZ = mobileZDistance - progress * (isMobile ? 4 : 3.5)
+
+    // Smoothly interpolate camera position
+    camera.position.x += (targetX - camera.position.x) * 0.05
+    camera.position.y += (targetY - camera.position.y) * 0.05
+    camera.position.z += (targetZ - camera.position.z) * 0.05
+    camera.lookAt(0, 1.3, 0)
+  })
 
   return null
 }

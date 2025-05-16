@@ -45,7 +45,7 @@ export default function CVSection() {
           </CardHeader>
           <CardContent className="space-y-4">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
-              <h3 className="text-lg font-medium">Project Mentor</h3>
+              <h3 className="text-lg font-mono font-bold">Project Mentor</h3>
               <p className="text-sm text-red-500">
                 Center for Innovation and Entrepreneurship, MLRIT • August 2024 - Present
               </p>
@@ -61,7 +61,7 @@ export default function CVSection() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
-              <h3 className="text-lg font-medium">Technical Intern</h3>
+              <h3 className="text-lg font-mono font-bold">Technical Intern</h3>
               <p className="text-sm text-red-500">
                 Centre for Innovation & Entrepreneurship, MLRIT • August 2024 - Present
               </p>
@@ -82,7 +82,7 @@ export default function CVSection() {
           </CardHeader>
           <CardContent className="space-y-4">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
-              <h3 className="text-lg font-medium">Bachelor of Technology</h3>
+              <h3 className="text-lg font-mono font-bold">Bachelor of Technology</h3>
               <p className="text-sm text-red-500">MLR Institute of Technology • 2023 - 2027</p>
               <p className="mt-2 text-sm text-gray-300">Computer Science and Engineering (Information Technology)</p>
               <p className="text-sm text-gray-300">CGPA: 8.71</p>
@@ -98,7 +98,7 @@ export default function CVSection() {
           </CardHeader>
           <CardContent className="space-y-4">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
-              <h3 className="text-lg font-medium">Certifications</h3>
+              <h3 className="text-lg font-mono font-bold">Certifications</h3>
               <ul className="mt-2 text-sm text-gray-300 list-disc list-inside">
                 <li>National Cadet Corps - NCC A Certificate Holder</li>
                 <li>C# Fundamentals - Microsoft, FreeCodeCamp</li>
@@ -112,7 +112,7 @@ export default function CVSection() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
-              <h3 className="text-lg font-medium">Awards</h3>
+              <h3 className="text-lg font-mono font-bold">Awards</h3>
               <ul className="mt-2 text-sm text-gray-300 list-disc list-inside">
                 <li>Multiple Gold/Silver Medals in International Olympiads in Maths, Science and English - SOF</li>
                 <li>Selected for Smart India Hackathon 2024</li>
@@ -134,32 +134,32 @@ export default function CVSection() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-              <h4 className="text-lg font-medium text-red-400 mb-2">Programming Languages</h4>
+              <h4 className="text-lg font-mono font-bold text-red-400 mb-2">Programming Languages</h4>
               <p className="text-sm text-gray-300">Python, Java, JavaScript, C#, C++, SQL</p>
             </div>
 
             <div className="p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-              <h4 className="text-lg font-medium text-red-400 mb-2">Web/App Development</h4>
+              <h4 className="text-lg font-mono font-bold text-red-400 mb-2">Web/App Development</h4>
               <p className="text-sm text-gray-300">React, Next.js, TailwindCSS, Node.js, Unity, Flutter, Wordpress</p>
             </div>
 
             <div className="p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-              <h4 className="text-lg font-medium text-red-400 mb-2">Design</h4>
+              <h4 className="text-lg font-mono font-bold text-red-400 mb-2">Design</h4>
               <p className="text-sm text-gray-300">User Experience (UX) Design, Figma, Canva, Spline, Three.js</p>
             </div>
 
             <div className="p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-              <h4 className="text-lg font-medium text-red-400 mb-2">DevOps & Cloud</h4>
+              <h4 className="text-lg font-mono font-bold text-red-400 mb-2">DevOps & Cloud</h4>
               <p className="text-sm text-gray-300">AWS, Docker, Hostinger, CyberPanel</p>
             </div>
 
             <div className="p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-              <h4 className="text-lg font-medium text-red-400 mb-2">ML & AI</h4>
+              <h4 className="text-lg font-mono font-bold text-red-400 mb-2">ML & AI</h4>
               <p className="text-sm text-gray-300">Tensorflow, Pytorch, huggingface, GCP, Unity-MLAgents</p>
             </div>
 
             <div className="p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-              <h4 className="text-lg font-medium text-red-400 mb-2">Tools</h4>
+              <h4 className="text-lg font-mono font-bold text-red-400 mb-2">Tools</h4>
               <p className="text-sm text-gray-300">
                 Postman, Git & GitHub, VSCode, Unity, Notion, Cursor, Fusion360, Blender
               </p>
@@ -167,7 +167,7 @@ export default function CVSection() {
           </div>
 
           <div className="mt-4 p-4 bg-red-900/10 border border-red-500/30 rounded-md">
-            <h4 className="text-lg font-medium text-red-400 mb-2">Soft Skills</h4>
+            <h4 className="text-lg font-mono font-bold text-red-400 mb-2">Soft Skills</h4>
             <p className="text-sm text-gray-300">Project Management, Design Thinking, Mentoring, Creativity</p>
           </div>
         </CardContent>

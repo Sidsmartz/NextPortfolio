@@ -425,12 +425,12 @@ export default function DashboardPage() {
               <div className="bg-gray-900 p-6 rounded-lg border border-red-500/30">
                 <h2 className="text-2xl font-retro text-red-500 mb-4 glitch-text">TS SIDDHARTH</h2>
                 <h3 className="text-xl mb-4">Computer Science Student & Tech Enthusiast</h3>
-                <p className="mb-4 text-gray-300">
+                <p className="mb-4 text-gray-300 font-mono">
                   I'm a passionate Computer Science student with expertise in web development, machine learning, and
                   application design. Currently pursuing my B.Tech in Computer Science and Engineering (IT) at MLR
                   Institute of Technology with a CGPA of 8.71.
                 </p>
-                <p className="text-gray-300">
+                <p className="text-gray-300 font-mono">
                   As a Project Mentor at the Center for Innovation and Entrepreneurship, I help students develop
                   innovative solutions using cutting-edge technologies.
                 </p>

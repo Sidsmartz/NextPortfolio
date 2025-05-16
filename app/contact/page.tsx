@@ -77,7 +77,7 @@ export default function ContactPage() {
             className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg border border-red-500/30"
           >
             <h3 className="text-xl font-retro text-red-500 mb-4">GET IN TOUCH</h3>
-            <p className="mb-6 text-gray-300">
+            <p className="mb-6 text-gray-300 font-mono">
               Interested in working together? Have a project in mind? Feel free to reach out and let's create something
               amazing.
             </p>

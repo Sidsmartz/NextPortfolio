@@ -35,8 +35,20 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
     cursor: none;
+  }
+  /* Use mono font for all non-heading text by default */
+  p, span, div {
+    @apply font-mono;
+  }
+  /* Keep headings with their original styling */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans;
+  }
+  /* Keep retro font class using CSS variable directly */
+  .font-retro {
+    font-family: var(--font-retro), monospace;
   }
 }
 
@@ -78,7 +90,8 @@
 
 /* Reusable arcade button style */
 .arcade-button {
-  @apply bg-red-600 hover:bg-red-700 text-white border-2 border-red-500 font-retro;
+  @apply bg-red-600 hover:bg-red-700 text-white border-2 border-red-500;
+  font-family: var(--font-retro), monospace;
   text-shadow: 0 0 5px #ff0000;
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
   transition: all 0.2s ease;
@@ -91,12 +104,14 @@
 
 /* Reusable text styles */
 .arcade-text {
-  @apply font-retro text-red-500;
+  font-family: var(--font-retro), monospace;
+  color: #ef4444;
   text-shadow: 0 0 5px #ff0000;
 }
 
 .arcade-text-glow {
-  @apply font-retro text-red-500;
+  font-family: var(--font-retro), monospace;
+  color: #ef4444;
   text-shadow: 0 0 8px #ff0000, 0 0 15px #ff0000;
 }
 

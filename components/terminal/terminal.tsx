@@ -166,7 +166,6 @@ export function Terminal({ commands, isRunning, progress, autoScroll = true }: T
       ref={terminalRef}
       className="bg-black text-green-500 font-mono p-4 h-full overflow-auto custom-scrollbar relative"
       style={{
-        fontFamily: "'Courier New', monospace",
         fontSize: "14px",
         lineHeight: "1.5",
         WebkitOverflowScrolling: "touch", // Helps with mobile scrolling
